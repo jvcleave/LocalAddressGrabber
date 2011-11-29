@@ -1,0 +1,3 @@
+Example of a simple utility to get your local ip address of your primary ethernet interface.
+
+Tested in openFrameworks 007 and Mac OS X 10.6.8
