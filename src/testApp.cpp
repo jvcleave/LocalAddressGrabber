@@ -4,8 +4,8 @@
 void testApp::setup(){
 	
 	
-	LocalAddressGrabber localAddressGrabber;
-	output = localAddressGrabber.getIpAddress();
+	LocalAddressGrabber :: availableList();
+	output = LocalAddressGrabber :: getIpAddress("en1");
 	
 }
 
@@ -16,6 +16,6 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	ofDrawBitmapString("YOUR IP ADDRESS FOR en0 is " + output , 20, 20);
+	ofDrawBitmapString(ofToString(output) , 20, 20);
 }
 

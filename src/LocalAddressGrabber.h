@@ -17,7 +17,50 @@
 class LocalAddressGrabber
 {
 public:
-	string getIpAddress()
+
+	static vector<string>& availableList(void){
+		struct ifaddrs *myaddrs;
+		struct ifaddrs *ifa;
+		struct sockaddr_in *s4;
+		int status;
+		
+		char buf[64];
+
+		vector<string> interfaces;
+		
+		status = getifaddrs(&myaddrs);
+		if (status != 0)
+		{
+			perror("getifaddrs");
+			
+		}
+		
+		for (ifa = myaddrs; ifa != NULL; ifa = ifa->ifa_next)
+		{
+			if (ifa->ifa_addr == NULL) continue;
+			if ((ifa->ifa_flags & IFF_UP) == 0) continue;
+			
+			if (ifa->ifa_addr->sa_family == AF_INET)
+			{
+				s4 = (struct sockaddr_in *)(ifa->ifa_addr);
+				if (inet_ntop(ifa->ifa_addr->sa_family, (void *)&(s4->sin_addr), buf, sizeof(buf)) == NULL)
+				{
+					printf("%s: inet_ntop failed!\n", ifa->ifa_name);
+				}
+				else
+				{
+					ofLogNotice() << ifa -> ifa_name;
+					interfaces.push_back(ifa -> ifa_name);
+					
+				}
+			}
+		}
+		
+		freeifaddrs(myaddrs);
+
+	}
+
+	static string getIpAddress(const string& interface)
 	{
 		string output = "NOT FOUND";
 		struct ifaddrs *myaddrs;
@@ -48,14 +91,16 @@ public:
 				}
 				else
 				{
-					if(ofToString(ifa->ifa_name) == "en0")
+					if(ofToString(ifa->ifa_name) == interface)
 					{
-						output = ofToString(buf);
+						freeifaddrs(myaddrs);
+						return ofToString(buf);
 					}
 				}
 			}
 		}
-		
+
+		ofLogWarning() << output;	
 		freeifaddrs(myaddrs);
 		return output;
 	}
